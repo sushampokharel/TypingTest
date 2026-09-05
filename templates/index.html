@@ -23,8 +23,7 @@
         <a class="site-nav__link" href="#results">Results</a>
       </nav>
 
-      <!-- TODO: Replace with the real test state once Flask provides it -->
-      <p class="status">
+      <p class="status{% if test_status == 'Running' %} status--running{% elif test_status == 'Finished' %} status--finished{% endif %}">
         <span class="status__dot" aria-hidden="true"></span>
         <span class="status__label">Status</span>
         <span class="status__value">{{ test_status | default('Not started') }}</span>
@@ -46,16 +45,15 @@
 
     <!-- ==================== Test panel (form) =======================
          No JavaScript: every interaction is a plain HTML form submission
-         that will be handled by the Flask routes in app.py.
+         handled by the Flask routes in app.py.
     ------------------------------------------------------------ -->
     <form class="test-form" id="test" method="POST" action="{{ url_for('start_test') }}">
 
       <!-- ------------------------ Duration ------------------------ -->
       <fieldset class="panel duration">
         <legend class="panel__title">Test duration</legend>
-        <p class="panel__hint">UI only for now &mdash; the timer is handled by Flask.</p>
+        <p class="panel__hint">Choose how long the test runs. The countdown is measured by Flask.</p>
 
-        <!-- TODO: Drive the selected option from the server side duration value -->
         <div class="chips" role="radiogroup" aria-label="Test duration in seconds">
           <label class="chip">
             <input class="chip__input" type="radio" name="duration" value="15"
@@ -90,8 +88,7 @@
       <section class="panel passage-panel">
         <div class="panel__head">
           <h2 class="panel__title">Typing passage</h2>
-          <!-- TODO: Render the randomly chosen passage supplied by Flask -->
-          <span class="tag">Passage {{ passage_index | default('--') }}</span>
+          <span class="tag">Passage {{ passage_number | default('--') }}</span>
         </div>
         <p class="passage" id="passage">{{ passage | default('The quick brown fox jumps over the lazy dog while a developer reviews the pull request, fixes a failing test, and ships a small improvement to production before the next standup meeting.') }}</p>
       </section>
@@ -102,33 +99,34 @@
           <label class="panel__title" for="typed-text">Your typing</label>
           <span class="panel__hint">Checked against the passage by Python</span>
         </div>
-        <!-- TODO: Refill with the text submitted so far -->
         <textarea class="typing-input" id="typed-text" name="typed_text" rows="6"
                   spellcheck="false" autocomplete="off" autocorrect="off"
                   autocapitalize="off"
-                  placeholder="Click &ldquo;Start Test&rdquo; and begin typing here&hellip;">{{ typed_text | default('') }}</textarea>
+                  placeholder="Start the test, type the passage above, then choose &ldquo;Finish &amp; See Results&rdquo;&hellip;">{{ typed_text | default('') }}</textarea>
       </section>
 
       <!-- ------------------------ Actions ------------------------- -->
       <div class="actions">
-        <!-- TODO: Point both buttons at the routes that implement the logic -->
         <button class="btn btn--primary" type="submit" formaction="{{ url_for('start_test') }}">
           Start Test
+        </button>
+        <button class="btn btn--soft" type="submit" formaction="{{ url_for('submit_test') }}">
+          Finish &amp; See Results
         </button>
         <button class="btn btn--ghost" type="submit" formaction="{{ url_for('restart_test') }}">
           Restart
         </button>
+        <p class="actions__note">Finish scores whatever is in the box, even if time is still left.</p>
       </div>
     </form>
 
     <!-- ========================= Statistics ========================= -->
     <section class="statistics" id="statistics" aria-labelledby="statistics-title">
       <div class="section-head">
-        <h2 class="section-head__title" id="statistics-title">Live statistics</h2>
-        <p class="section-head__text">Placeholder values until Flask starts reporting them.</p>
+        <h2 class="section-head__title" id="statistics-title">Statistics</h2>
+        <p class="section-head__text">Recalculated by Flask on every submission.</p>
       </div>
 
-      <!-- TODO: Replace every placeholder below with the matching context value -->
       <div class="cards">
         <article class="card">
           <h3 class="card__label">WPM</h3>
@@ -161,6 +159,7 @@
 
       <div class="panel results__panel">
         <!-- TODO: Show a best-score summary when one is available -->
+        {% if test_status == 'Finished' %}
         <dl class="results__list">
           <div class="results__row results__row--highlight">
             <dt class="results__term">Final WPM</dt>
@@ -187,10 +186,11 @@
             <dd class="results__detail">{{ total_characters | default('--') }}</dd>
           </div>
         </dl>
-
+        {% else %}
         <p class="results__empty">
-          No results yet. Start a test to see your typing score here.
+          No results yet. Start a test, type the passage, then finish it to see your score here.
         </p>
+        {% endif %}
       </div>
     </section>
   </main>

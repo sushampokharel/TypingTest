@@ -1,9 +1,4 @@
-/* ==========================================================================
-   TypeTest -- stylesheet
-   Plain CSS only: no JavaScript is used anywhere in this project.
-   ========================================================================== */
 
-/* ---------- Design tokens ---------- */
 :root {
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
@@ -184,6 +179,34 @@ a {
 
 .status__value {
   font-weight: 600;
+}
+
+.status--running {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-strong);
+}
+
+.status--running .status__dot {
+  background: var(--color-accent);
+}
+
+.status--running .status__label {
+  color: var(--color-accent-strong);
+}
+
+.status--finished {
+  border-color: #b7dcc6;
+  background: #ebf6ef;
+  color: var(--color-good);
+}
+
+.status--finished .status__dot {
+  background: var(--color-good);
+}
+
+.status--finished .status__label {
+  color: var(--color-good);
 }
 
 /* ---------- Main / intro ---------- */
@@ -445,6 +468,24 @@ a {
   color: var(--color-accent-strong);
 }
 
+.btn--soft {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-strong);
+}
+
+.btn--soft:hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: #ffffff;
+}
+
+.actions__note {
+  flex: 1 1 100%;
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+}
+
 /* ---------- Section headings ---------- */
 .section-head {
   margin: clamp(36px, 5vw, 52px) 0 16px;
@@ -564,11 +605,10 @@ a {
 }
 
 .results__empty {
-  padding: 0 clamp(18px, 2.6vw, 24px) 18px;
-  border-top: 1px dashed var(--color-border-strong);
-  padding-top: 16px;
+  padding: clamp(26px, 4vw, 38px) clamp(18px, 2.6vw, 24px);
   color: var(--color-text-muted);
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
+  text-align: center;
 }
 
 /* ---------- Footer ---------- */
