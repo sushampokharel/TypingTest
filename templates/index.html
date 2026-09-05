@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="TypeTest -- a clean typing speed test. Timer, WPM, accuracy and character counts are all calculated server side with Python and Flask.">
+  <title>TypeTest &middot; Test Your Typing Speed</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+  <!-- ============================ Header ============================ -->
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="brand" href="{{ url_for('index') }}">
+        <span class="brand__mark" aria-hidden="true">TT</span>
+        <span class="brand__name">TypeTest</span>
+      </a>
+
+      <nav class="site-nav" aria-label="Main">
+        <a class="site-nav__link" href="#test">Test</a>
+        <a class="site-nav__link" href="#statistics">Statistics</a>
+        <a class="site-nav__link" href="#results">Results</a>
+      </nav>
+
+      <!-- TODO: Replace with the real test state once Flask provides it -->
+      <p class="status">
+        <span class="status__dot" aria-hidden="true"></span>
+        <span class="status__label">Status</span>
+        <span class="status__value">{{ test_status | default('Not started') }}</span>
+      </p>
+    </div>
+  </header>
+
+  <main class="container main">
+
+    <!-- ============================ Intro ============================ -->
+    <section class="intro">
+      <h1 class="intro__title">Test Your Typing Speed</h1>
+      <p class="intro__text">
+        Reproduce the passage below as fast and as accurately as you can. Pick a
+        duration, start the test and TypeTest reports your words per minute,
+        accuracy and character counts &mdash; all measured on the server with Python.
+      </p>
+    </section>
+
+    <!-- ==================== Test panel (form) =======================
+         No JavaScript: every interaction is a plain HTML form submission
+         that will be handled by the Flask routes in app.py.
+    ------------------------------------------------------------ -->
+    <form class="test-form" id="test" method="POST" action="{{ url_for('start_test') }}">
+
+      <!-- ------------------------ Duration ------------------------ -->
+      <fieldset class="panel duration">
+        <legend class="panel__title">Test duration</legend>
+        <p class="panel__hint">UI only for now &mdash; the timer is handled by Flask.</p>
+
+        <!-- TODO: Drive the selected option from the server side duration value -->
+        <div class="chips" role="radiogroup" aria-label="Test duration in seconds">
+          <label class="chip">
+            <input class="chip__input" type="radio" name="duration" value="15"
+                   {% if (duration | default(60)) == 15 %}checked{% endif %}>
+            <span class="chip__body">
+              <span class="chip__value">15</span>
+              <span class="chip__unit">seconds</span>
+            </span>
+          </label>
+
+          <label class="chip">
+            <input class="chip__input" type="radio" name="duration" value="30"
+                   {% if (duration | default(60)) == 30 %}checked{% endif %}>
+            <span class="chip__body">
+              <span class="chip__value">30</span>
+              <span class="chip__unit">seconds</span>
+            </span>
+          </label>
+
+          <label class="chip">
+            <input class="chip__input" type="radio" name="duration" value="60"
+                   {% if (duration | default(60)) == 60 %}checked{% endif %}>
+            <span class="chip__body">
+              <span class="chip__value">60</span>
+              <span class="chip__unit">seconds</span>
+            </span>
+          </label>
+        </div>
+      </fieldset>
+
+      <!-- ------------------------ Passage ------------------------- -->
+      <section class="panel passage-panel">
+        <div class="panel__head">
+          <h2 class="panel__title">Typing passage</h2>
+          <!-- TODO: Render the randomly chosen passage supplied by Flask -->
+          <span class="tag">Passage {{ passage_index | default('--') }}</span>
+        </div>
+        <p class="passage" id="passage">{{ passage | default('The quick brown fox jumps over the lazy dog while a developer reviews the pull request, fixes a failing test, and ships a small improvement to production before the next standup meeting.') }}</p>
+      </section>
+
+      <!-- ------------------------- Input -------------------------- -->
+      <section class="panel input-panel">
+        <div class="panel__head">
+          <label class="panel__title" for="typed-text">Your typing</label>
+          <span class="panel__hint">Checked against the passage by Python</span>
+        </div>
+        <!-- TODO: Refill with the text submitted so far -->
+        <textarea class="typing-input" id="typed-text" name="typed_text" rows="6"
+                  spellcheck="false" autocomplete="off" autocorrect="off"
+                  autocapitalize="off"
+                  placeholder="Click &ldquo;Start Test&rdquo; and begin typing here&hellip;">{{ typed_text | default('') }}</textarea>
+      </section>
+
+      <!-- ------------------------ Actions ------------------------- -->
+      <div class="actions">
+        <!-- TODO: Point both buttons at the routes that implement the logic -->
+        <button class="btn btn--primary" type="submit" formaction="{{ url_for('start_test') }}">
+          Start Test
+        </button>
+        <button class="btn btn--ghost" type="submit" formaction="{{ url_for('restart_test') }}">
+          Restart
+        </button>
+      </div>
+    </form>
+
+    <!-- ========================= Statistics ========================= -->
+    <section class="statistics" id="statistics" aria-labelledby="statistics-title">
+      <div class="section-head">
+        <h2 class="section-head__title" id="statistics-title">Live statistics</h2>
+        <p class="section-head__text">Placeholder values until Flask starts reporting them.</p>
+      </div>
+
+      <!-- TODO: Replace every placeholder below with the matching context value -->
+      <div class="cards">
+        <article class="card">
+          <h3 class="card__label">WPM</h3>
+          <p class="card__value">{{ wpm | default('--') }}<span class="card__unit">words / min</span></p>
+        </article>
+
+        <article class="card">
+          <h3 class="card__label">Accuracy</h3>
+          <p class="card__value">{{ accuracy | default('--') }}<span class="card__unit">percent</span></p>
+        </article>
+
+        <article class="card">
+          <h3 class="card__label">Time</h3>
+          <p class="card__value">{{ time_remaining | default('--') }}<span class="card__unit">seconds left</span></p>
+        </article>
+
+        <article class="card">
+          <h3 class="card__label">Characters</h3>
+          <p class="card__value">{{ characters_typed | default('--') }}<span class="card__unit">typed</span></p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ========================== Results =========================== -->
+    <section class="results" id="results" aria-labelledby="results-title">
+      <div class="section-head">
+        <h2 class="section-head__title" id="results-title">Results</h2>
+        <p class="section-head__text">Filled in once the test has been scored.</p>
+      </div>
+
+      <div class="panel results__panel">
+        <!-- TODO: Show a best-score summary when one is available -->
+        <dl class="results__list">
+          <div class="results__row results__row--highlight">
+            <dt class="results__term">Final WPM</dt>
+            <dd class="results__detail">{{ final_wpm | default('--') }} <span class="results__suffix">words / min</span></dd>
+          </div>
+
+          <div class="results__row">
+            <dt class="results__term">Accuracy</dt>
+            <dd class="results__detail">{{ final_accuracy | default('--') }} <span class="results__suffix">%</span></dd>
+          </div>
+
+          <div class="results__row">
+            <dt class="results__term">Correct characters</dt>
+            <dd class="results__detail results__detail--good">{{ correct_characters | default('--') }}</dd>
+          </div>
+
+          <div class="results__row">
+            <dt class="results__term">Incorrect characters</dt>
+            <dd class="results__detail results__detail--bad">{{ incorrect_characters | default('--') }}</dd>
+          </div>
+
+          <div class="results__row results__row--last">
+            <dt class="results__term">Total characters</dt>
+            <dd class="results__detail">{{ total_characters | default('--') }}</dd>
+          </div>
+        </dl>
+
+        <p class="results__empty">
+          No results yet. Start a test to see your typing score here.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============================ Footer =========================== -->
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <p class="site-footer__copy">&copy; TypeTest &mdash; HTML, CSS, Python and Flask.</p>
+      <p class="site-footer__meta">Timer, WPM, accuracy and validation are handled server side.</p>
+    </div>
+  </footer>
+
+</body>
+</html>
