@@ -1,7 +1,7 @@
 import random
 import time
 
-from pasaages import PASSAGES
+from passages import PASSAGES
 
 _test_state = {
     "passage": None,
