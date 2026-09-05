@@ -1,9 +1,9 @@
-"""Typing passages (intentionally left empty).
+PASSAGES = [
+    """
+    The Quick Brown Fox jumps over the lazy dog.
+    """,
 
-The frontend ships with a single hard-coded sample passage so the UI can be
-reviewed. Real, randomly selected passages will be served from here by Flask.
-"""
-
-# TODO: Add the collection of typing passages used by the test.
-# TODO: Implement random passage selection (see logic.get_random_passage).
-PASSAGES = []
+    """
+    Learning to code takes patience, practice, and curiosity. Every mistake is an opportunity to understand something new.
+    """
+]
